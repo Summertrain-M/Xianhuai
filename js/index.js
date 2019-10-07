@@ -1,96 +1,114 @@
-// JavaScript Document
+$(function () {
+//---导航栏固定
 
-$(".product ul li:gt(0)").hide();
-	
-	var tt,n=0,len;
-	len=$(".product ul li").length;
-	
-	function autoPlay(){
-		tt=setInterval(function(){		
-			n++;
-			if(n>=len)n=0;
-			$(".product ul li").eq(n).show().siblings().hide();
-			$(".product span").eq(n).addClass("curr").siblings().removeClass("curr");
-		},3000);
+//---焦点图 
+	var _left = 710;
+	var left = -_left;
+	function mainShow() {
+		if(left == -6390 || left == 0) {
+			_left = -_left;
+		}
+		$('.wrap').stop().animate({'left':left},1000);
+		left = left - _left;
+		timer = setTimeout(mainShow,5000);
 	}
-	autoPlay();	
-	
-	$(".product span").each(function(index){
-		$(this).mouseover(function(){
-			n=index;
-			$(".product ul li").eq(n).show().siblings("li").hide();
-			$(".product span").eq(n).addClass("curr").siblings().removeClass("curr");	
-		});
+	mainShow();
+	// 鼠标滑过图片停止
+	$('div.v').hover(
+		function() {
+			clearTimeout(timer);
+			$('.thumbpics').fadeIn();
+		},
+		function() {
+			$('.thumbpics').fadeOut();
+			timer = setTimeout(mainShow,5000);
+		}
+	);
+	// 鼠标滑过缩略图切换图片
+	$('.thumbpics li').mouseover(function () {
+		var key = $(this).parent().find('li').index(this);
+		left = key * -710;
+		clearTimeout(timer);
+		$('.wrap').stop().animate({'left':left},1000);
+		if(left == -6390) {
+			left = -6390 + 710;
+		}
+		if(left == 0) {
+			left = -710;
+		}
+		$(this).parent().find('li').css('background','none');
+		$(this).parent().find('li').get(key).style.background = 'orange';
+	});
+
+
+
+//-----展示列表动画
+	$('.thumb li').hover(function () {
+		$(this).find('.cover').stop(true,true).slideDown(300);
+	  	$(this).children("p").stop(true,true).animate({"bottom":0},300);
+	},function (){
+		$(this).find('.cover').stop(true,true).slideUp(300);
+		$(this).children("p").stop(true,true).animate({"bottom":-40},300);
 	});
 	
-	$(".product").hover(function(){
-		clearInterval(tt);
-	},function(){
-		autoPlay();
-	});
 	
-	$(".news ul:gt(0)").hide();
-	$(".news span").each(function(index){
-		$(this).click(function(){
-			n=index;
-			$(".news >ul").eq(n).show().siblings().hide();
-			$(".news >span").show();
-			$(".news >span").eq(n).removeClass("cur").siblings().addClass("cur");
-			$(".news >ul").removeClass("cur");
-		});
-	});
+
+//---竖屏滚动 
+	function removeWhitespace(xml) {
+		var loopIndex;
+		for (loopIndex = 0; loopIndex < xml.childNodes.length; loopIndex++){
+			var currentNode = xml.childNodes[loopIndex];
+			if (currentNode.nodeType == 1){
+				removeWhitespace(currentNode);
+			}
 	
-	
-	/*首页内容一效果*/
-	$(".goods ul:gt(0)").hide();
-	len=$(".goods ul").length;
-	var i=0;
-	function autoPlay01(){
-		t=setInterval(function(){		
-			i++;
-			if(i>=len)i=0;
-			$(".goods ul").eq(i).show().siblings().hide();
-			$(".main01 .right b").eq(i).addClass("curr01").siblings().removeClass("curr01");
-		},3000);
+			if (((/^\s+$/.test(currentNode.nodeValue))) && (currentNode.nodeType == 3)){
+				xml.removeChild(xml.childNodes[loopIndex--]);
+			}
+		}
+	};
+	var rollObj = document.getElementsByClassName('wbdesc')[0];
+	removeWhitespace(rollObj);
+	var firstChild = rollObj.firstChild;
+	var firstChildHeight = firstChild.offsetHeight;
+	rollObj.style.top = - firstChildHeight - 10 + 'px';
+	var h = parseInt(rollObj.style.top);
+	var n = h;
+	function autoRoll() {
+		n = n + Math.abs(h / 100);
+		if(n <= 0) {
+			rollObj.style.top = n + 'px';
+			window.setTimeout(arguments.callee,30);
+		} else {
+			firstChild = rollObj.lastChild.cloneNode(true);
+			rollObj.removeChild(rollObj.lastChild);
+			rollObj.insertBefore(firstChild,rollObj.firstChild);
+			firstChildHeight = firstChild.offsetHeight;
+			rollObj.style.top = - firstChildHeight - 10 + 'px';
+			h = parseInt(rollObj.style.top);
+			n = h;
+			window.setTimeout(arguments.callee,3000);
+		}
+
 	}
-	autoPlay01();	
-		
-	$(".goods").hover(function(){
-		clearInterval(t);
-	},function(){
-		autoPlay01();
-	});
-	
-	$(".main01 .right p:eq(0)").hover(function(){
-		clearInterval(t);
-		$(".main01 .right p:eq(0)").addClass("curr02");
-	},function(){
-		autoPlay01();
-		$(".main01 .right p:eq(0)").removeClass("curr02");
-	});
-	
-	$(".main01 .right p:eq(1)").hover(function(){
-		clearInterval(t);
-		$(".main01 .right p:eq(1)").addClass("curr02");
-	},function(){
-		autoPlay01();
-		$(".main01 .right p:eq(1)").removeClass("curr02");
-	});	
-	
-	$(".main01 .right p:eq(0)").click(function(){
-		clearInterval(t);
-		if(i<=0)i=len;
-		i--;
-		$(".main01 .right p:eq(0)").addClass("curr02");
-		$(".goods ul").eq(i).show().siblings().hide();
-		$(".main01 .right b").eq(i).addClass("curr01").siblings().removeClass("curr01");
-	});
-	
-	$(".main01 .right p:eq(1)").click(function(){
-		clearInterval(t);
-		i++;	
-		if(i>=len)i=0;
-		$(".main01 .right p:eq(1)").addClass("curr02");
-		$(".goods ul").eq(i).show().siblings().hide();
-		$(".main01 .right b").eq(i).addClass("curr01").siblings().removeClass("curr01");
-	});s
+	autoRoll();
+
+
+//---微信二维码 
+	$('.weixin').hover(
+		function () {
+			$('.wximg').fadeIn(300);
+		},
+		function () {
+			return false;
+		}
+	);
+	$('.wximg').hover(
+		function () {
+			return false;
+		},
+		function () {
+			$('.wximg').fadeOut(300);
+		}
+	);
+});
